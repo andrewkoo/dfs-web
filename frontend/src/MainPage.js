@@ -1,7 +1,7 @@
-import logo from './logo.svg';
+import React from 'react';
 import './App.css';
 
-function Bulma_Table() {
+function BulmaTable() {
   return (
     <body>
       <div class='container has-text-centered'>
@@ -67,26 +67,27 @@ function Bulma_Table() {
   );
 }
 
-function App() {
-  return (
-    <div className="App columns">
-      <div className='column nav-col is-one-fifth'>
-        <div><button className='nav-button'>Contests</button></div>
-        <div><button className='nav-button'>Performance</button></div>
+class MainPage extends React.Component {
+  render() {
+    return (
+      <div className="App columns">
+        <div className='column nav-col is-one-fifth'>
+          <div><button className='nav-button'>Contests</button></div>
+          <div><button className='nav-button'>Performance</button></div>
+        </div>
+        <div className='column page-col'>
+          <header className="App-header">
+            <div className="title">
+              <h1>Upcoming Contests</h1>
+            </div>
+          </header>
+          <body className="App-body">
+            <BulmaTable/>  
+          </body>
+        </div>
       </div>
-      <div className='column page-col'>
-        <header className="App-header">
-          <div className="title">
-            <h1>Upcoming Contests</h1>
-          </div>
-        </header>
-        <body className="App-body">
-          <Bulma_Table/>  
-        </body>
-      </div>
-    </div>
-    
-  );
+    )
+  }
 }
 
-export default App;
+export default MainPage;
