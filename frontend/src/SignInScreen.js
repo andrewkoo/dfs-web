@@ -1,7 +1,14 @@
 // Import FirebaseAuth and firebase.
 import React from 'react';
+import './App.css';
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 import firebase from 'firebase';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link
+} from "react-router-dom";
 
 // Your web app's Firebase configuration
 var firebaseConfig = {
@@ -50,18 +57,19 @@ class SignInScreen extends React.Component {
     if (!this.state.isSignedIn) {
       return (
         <div>
-          <h1>My App</h1>
-          <p>Please sign-in:</p>
+          <h1>Contest Tracker</h1>
           <StyledFirebaseAuth uiConfig={this.uiConfig} firebaseAuth={firebase.auth()}/>
         </div>
       );
     }
     return (
       <div>
-        <h1>My App</h1>
+        <h1>Contest Tracker</h1>
         <p>Welcome {firebase.auth().currentUser.displayName}! You are now signed-in!</p>
         <p>Your email address: {firebase.auth().currentUser.email}</p>
         <a onClick={() => firebase.auth().signOut()}>Sign-out</a>
+        <p></p>
+        <Link to="/home">Continue to Home Page</Link>
       </div>
     );
   }

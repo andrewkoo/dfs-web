@@ -1,11 +1,24 @@
 import './App.css';
 import React from 'react';
 import SignInScreen from './SignInScreen.js';
-import MainPage from './MainPage.js';
+import HomeScreen from './HomeScreen.js';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route
+  // Link
+} from "react-router-dom";
 
 function App() {
   return (
-    <SignInScreen/>
+    <Router>
+      <div>
+        <Switch>
+          <Route path="/" exact component={SignInScreen} />
+          <Route path="/home" component={HomeScreen} />
+        </Switch>
+      </div>
+    </Router>
   );
 
   // return (
@@ -13,8 +26,6 @@ function App() {
   //       <div className="App">
   //           <Nav isSignedIn={!!this.state.user} />
   //           <Switch>
-  //               <Route path="/" exact component={Home} />
-  //               <Route path="/demo" component={Demo} />
   //               <Route path="/about" component={About} />
   //               <Route path="/signup" component={Signup} />
   //           </Switch>

@@ -3,11 +3,11 @@ import './App.css';
 
 function BulmaTable() {
   return (
-    <body>
-      <div class='container has-text-centered'>
-        <div class='columns is-centered'>
-          <div class='column is-centered'>
-            <table class='table'>
+    <div>
+      <div className='container has-text-centered'>
+        <div className='columns is-centered'>
+          <div className='column is-centered'>
+            <table className='table'>
               <thead>
                 <tr>
                   <th>Date</th>
@@ -63,11 +63,11 @@ function BulmaTable() {
           </div>
         </div>
       </div>
-    </body>
+    </div>
   );
 }
 
-class MainPage extends React.Component {
+class HomeScreen extends React.Component {
   render() {
     return (
       <div className="App columns">
@@ -81,13 +81,13 @@ class MainPage extends React.Component {
               <h1>Upcoming Contests</h1>
             </div>
           </header>
-          <body className="App-body">
+          <div className="App-body">
             <BulmaTable/>  
-          </body>
+          </div>
         </div>
       </div>
     )
   }
 }
 
-export default MainPage;
+export default HomeScreen;
