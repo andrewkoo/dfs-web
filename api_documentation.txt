@@ -1,0 +1,41 @@
+GET /players/{proxy+}
+
+description: if /players is requested, then all player data is returned. 
+             if /players/{slate} is requested, then players with a matching slate ID will be returned instead
+             
+example response:
+{
+    slate: int,    
+    players: [
+        {
+            slate: int,
+            Opp: str,
+            Title: str,
+            Player: str,
+            Pos: str,
+            Start: str,
+            Team: str,
+            BestOf: int,
+            Odds: float,
+            Win %: float,
+            Salary: int,
+            Proj: float
+        }, ...
+    ]
+}
+
+POST /players
+
+expected body: 
+{
+  player: str,
+  slate: int,
+  Start: str
+}
+
+expected response:
+{
+  player: str,
+  slate: int
+  Start: str
+}

@@ -64,13 +64,33 @@ functions:
       - http:
           path: hello
           method: post
+          cors: true
   whoami: 
     handler: handler.whoami
     events:
       - http:
           path: /whoami
           method: get
+          cors: true
+  players: 
+    handler: handler.get_players
+    events:
+      - http:
+          path: /players
+          method: get
+          cors: true
+      - http: 
+          path: /players/{proxy+}
+          method: get
+          cors: true
 
+plugins:
+  - serverless-offline
+  - serverless-python-requirements
+  
+custom:
+  serverless-offline:
+    httpPort: 4000
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events

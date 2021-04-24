@@ -97,6 +97,12 @@
               "LogGroupName": "/aws/lambda/dfs-web-dev-whoami"
             }
           },
+          "PlayersLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/dfs-web-dev-players"
+            }
+          },
           "IamRoleLambdaExecution": {
             "Type": "AWS::IAM::Role",
             "Properties": {
@@ -217,6 +223,12 @@
                               "WhoamiLogGroup",
                               "Arn"
                             ]
+                          },
+                          {
+                            "Fn::GetAtt": [
+                              "PlayersLogGroup",
+                              "Arn"
+                            ]
                           }
                         ]
                       }
@@ -233,7 +245,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/dfs-web/dev/1619046685354-2021-04-21T23:11:25.354Z/dfs-web.zip"
+                "S3Key": "serverless/dfs-web/dev/1619280968957-2021-04-24T16:16:08.957Z/dfs-web.zip"
               },
               "Handler": "s_hello.handler",
               "Runtime": "python3.8",
@@ -258,7 +270,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/dfs-web/dev/1619046685354-2021-04-21T23:11:25.354Z/dfs-web.zip"
+                "S3Key": "serverless/dfs-web/dev/1619280968957-2021-04-24T16:16:08.957Z/dfs-web.zip"
               },
               "Handler": "s_whoami.handler",
               "Runtime": "python3.8",
@@ -276,24 +288,59 @@
               "WhoamiLogGroup"
             ]
           },
-          "HelloLambdaVersionUWc2TdbGsybDZJQRzg9pgo2fDJG5vDoqtxTBjsaVyJU": {
+          "PlayersLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/dfs-web/dev/1619280968957-2021-04-24T16:16:08.957Z/dfs-web.zip"
+              },
+              "Handler": "s_players.handler",
+              "Runtime": "python3.8",
+              "FunctionName": "dfs-web-dev-players",
+              "MemorySize": 1024,
+              "Timeout": 6,
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "PlayersLogGroup"
+            ]
+          },
+          "HelloLambdaVersionKZZnfL1rh5Zny30gkDKOsz1zW9c5eZ82m4xu3bANNAw": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "HelloLambdaFunction"
               },
-              "CodeSha256": "a/6JmO5ooOEz8voQEM35E0A/0HmWhvHDU9Eky0GD0Pk="
+              "CodeSha256": "dnd88fAkWOs2a2aGb2ZCh7RTNEfVWGs/G+lk2bJZU1k="
             }
           },
-          "WhoamiLambdaVersionnj15TlkmdMsbtYIW0mM6tMhil3qoMRK1yxgohg4MYI": {
+          "WhoamiLambdaVersion2QvOkeKlDyDltJQcUhC13VPUDBj7DyADjJ0jkijElw": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "WhoamiLambdaFunction"
               },
-              "CodeSha256": "a/6JmO5ooOEz8voQEM35E0A/0HmWhvHDU9Eky0GD0Pk="
+              "CodeSha256": "dnd88fAkWOs2a2aGb2ZCh7RTNEfVWGs/G+lk2bJZU1k="
+            }
+          },
+          "PlayersLambdaVersionv4BFQNaCOFFqHwM6t86BAAEBos8rmrp0wPkydbkdY": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "PlayersLambdaFunction"
+              },
+              "CodeSha256": "dnd88fAkWOs2a2aGb2ZCh7RTNEfVWGs/G+lk2bJZU1k="
             }
           },
           "ApiGatewayRestApi": {
@@ -333,6 +380,213 @@
                 ]
               },
               "PathPart": "whoami",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourcePlayers": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayRestApi",
+                  "RootResourceId"
+                ]
+              },
+              "PathPart": "players",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourcePlayersProxyVar": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourcePlayers"
+              },
+              "PathPart": "{proxy+}",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodHelloOptions": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "AuthorizationType": "NONE",
+              "HttpMethod": "OPTIONS",
+              "MethodResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true,
+                    "method.response.header.Access-Control-Allow-Headers": true,
+                    "method.response.header.Access-Control-Allow-Methods": true
+                  },
+                  "ResponseModels": {}
+                }
+              ],
+              "RequestParameters": {},
+              "Integration": {
+                "Type": "MOCK",
+                "RequestTemplates": {
+                  "application/json": "{statusCode:200}"
+                },
+                "ContentHandling": "CONVERT_TO_TEXT",
+                "IntegrationResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'",
+                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,POST'"
+                    },
+                    "ResponseTemplates": {
+                      "application/json": "#set($origin = $input.params(\"Origin\"))\n#if($origin == \"\") #set($origin = $input.params(\"origin\")) #end\n#if($origin.matches(\".+\")) #set($context.responseOverride.header.Access-Control-Allow-Origin = $origin) #end"
+                    }
+                  }
+                ]
+              },
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceHello"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodWhoamiOptions": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "AuthorizationType": "NONE",
+              "HttpMethod": "OPTIONS",
+              "MethodResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true,
+                    "method.response.header.Access-Control-Allow-Headers": true,
+                    "method.response.header.Access-Control-Allow-Methods": true
+                  },
+                  "ResponseModels": {}
+                }
+              ],
+              "RequestParameters": {},
+              "Integration": {
+                "Type": "MOCK",
+                "RequestTemplates": {
+                  "application/json": "{statusCode:200}"
+                },
+                "ContentHandling": "CONVERT_TO_TEXT",
+                "IntegrationResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'",
+                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET'"
+                    },
+                    "ResponseTemplates": {
+                      "application/json": "#set($origin = $input.params(\"Origin\"))\n#if($origin == \"\") #set($origin = $input.params(\"origin\")) #end\n#if($origin.matches(\".+\")) #set($context.responseOverride.header.Access-Control-Allow-Origin = $origin) #end"
+                    }
+                  }
+                ]
+              },
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceWhoami"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodPlayersOptions": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "AuthorizationType": "NONE",
+              "HttpMethod": "OPTIONS",
+              "MethodResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true,
+                    "method.response.header.Access-Control-Allow-Headers": true,
+                    "method.response.header.Access-Control-Allow-Methods": true
+                  },
+                  "ResponseModels": {}
+                }
+              ],
+              "RequestParameters": {},
+              "Integration": {
+                "Type": "MOCK",
+                "RequestTemplates": {
+                  "application/json": "{statusCode:200}"
+                },
+                "ContentHandling": "CONVERT_TO_TEXT",
+                "IntegrationResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'",
+                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET'"
+                    },
+                    "ResponseTemplates": {
+                      "application/json": "#set($origin = $input.params(\"Origin\"))\n#if($origin == \"\") #set($origin = $input.params(\"origin\")) #end\n#if($origin.matches(\".+\")) #set($context.responseOverride.header.Access-Control-Allow-Origin = $origin) #end"
+                    }
+                  }
+                ]
+              },
+              "ResourceId": {
+                "Ref": "ApiGatewayResourcePlayers"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodPlayersProxyVarOptions": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "AuthorizationType": "NONE",
+              "HttpMethod": "OPTIONS",
+              "MethodResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true,
+                    "method.response.header.Access-Control-Allow-Headers": true,
+                    "method.response.header.Access-Control-Allow-Methods": true
+                  },
+                  "ResponseModels": {}
+                }
+              ],
+              "RequestParameters": {},
+              "Integration": {
+                "Type": "MOCK",
+                "RequestTemplates": {
+                  "application/json": "{statusCode:200}"
+                },
+                "ContentHandling": "CONVERT_TO_TEXT",
+                "IntegrationResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'",
+                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET'"
+                    },
+                    "ResponseTemplates": {
+                      "application/json": "#set($origin = $input.params(\"Origin\"))\n#if($origin == \"\") #set($origin = $input.params(\"origin\")) #end\n#if($origin.matches(\".+\")) #set($context.responseOverride.header.Access-Control-Allow-Origin = $origin) #end"
+                    }
+                  }
+                ]
+              },
+              "ResourceId": {
+                "Ref": "ApiGatewayResourcePlayersProxyVar"
+              },
               "RestApiId": {
                 "Ref": "ApiGatewayRestApi"
               }
@@ -424,7 +678,93 @@
               "MethodResponses": []
             }
           },
-          "ApiGatewayDeployment1619046681277": {
+          "ApiGatewayMethodPlayersGet": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "GET",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourcePlayers"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "NONE",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "PlayersLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            }
+          },
+          "ApiGatewayMethodPlayersProxyVarGet": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "GET",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourcePlayersProxyVar"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "NONE",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "PlayersLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            }
+          },
+          "ApiGatewayDeployment1619280954956": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -433,8 +773,14 @@
               "StageName": "dev"
             },
             "DependsOn": [
+              "ApiGatewayMethodHelloOptions",
+              "ApiGatewayMethodWhoamiOptions",
+              "ApiGatewayMethodPlayersOptions",
+              "ApiGatewayMethodPlayersProxyVarOptions",
               "ApiGatewayMethodHelloPost",
-              "ApiGatewayMethodWhoamiGet"
+              "ApiGatewayMethodWhoamiGet",
+              "ApiGatewayMethodPlayersGet",
+              "ApiGatewayMethodPlayersProxyVarGet"
             ]
           },
           "HelloLambdaPermissionApiGateway": {
@@ -480,6 +826,43 @@
               "FunctionName": {
                 "Fn::GetAtt": [
                   "WhoamiLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    "/*/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "PlayersLambdaPermissionApiGateway": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "PlayersLambdaFunction",
                   "Arn"
                 ]
               },
@@ -620,7 +1003,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/dfs-web/dev/1619046685354-2021-04-21T23:11:25.354Z/custom-resources.zip"
+                "S3Key": "serverless/dfs-web/dev/1619280968957-2021-04-24T16:16:08.957Z/custom-resources.zip"
               },
               "FunctionName": "dfs-web-dev-custom-resource-apigw-cw-role",
               "Handler": "apiGatewayCloudWatchRole/handler.handler",
@@ -658,6 +1041,16 @@
               }
             }
           },
+          "CloudWatchLogsSubscriptionFilterPlayersLogGroup": {
+            "Type": "AWS::Logs::SubscriptionFilter",
+            "Properties": {
+              "DestinationArn": "arn:aws:logs:us-east-1:802587217904:destination:3d8fcba4-af3d-47f0-84cc-e78c4ffb51d0#t9FFMKH4SwnPRqndc9#dfs-web#dev",
+              "FilterPattern": "?\"REPORT RequestId: \" ?\"SERVERLESS_ENTERPRISE\"",
+              "LogGroupName": {
+                "Ref": "PlayersLogGroup"
+              }
+            }
+          },
           "CloudWatchLogsSubscriptionFilterApiGatewayLogGroup": {
             "Type": "AWS::Logs::SubscriptionFilter",
             "Properties": {
@@ -686,13 +1079,19 @@
           "HelloLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "HelloLambdaVersionUWc2TdbGsybDZJQRzg9pgo2fDJG5vDoqtxTBjsaVyJU"
+              "Ref": "HelloLambdaVersionKZZnfL1rh5Zny30gkDKOsz1zW9c5eZ82m4xu3bANNAw"
             }
           },
           "WhoamiLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "WhoamiLambdaVersionnj15TlkmdMsbtYIW0mM6tMhil3qoMRK1yxgohg4MYI"
+              "Ref": "WhoamiLambdaVersion2QvOkeKlDyDltJQcUhC13VPUDBj7DyADjJ0jkijElw"
+            }
+          },
+          "PlayersLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "PlayersLambdaVersionv4BFQNaCOFFqHwM6t86BAAEBos8rmrp0wPkydbkdY"
             }
           },
           "ServiceEndpoint": {
@@ -809,6 +1208,15 @@
       },
       "vpc": {}
     },
+    "custom": {
+      "serverless-offline": {
+        "httpPort": 4000
+      }
+    },
+    "plugins": [
+      "serverless-offline",
+      "serverless-python-requirements"
+    ],
     "pluginsData": {},
     "functions": {
       "hello": {
@@ -818,6 +1226,25 @@
             "http": {
               "path": "hello",
               "method": "post",
+              "cors": {
+                "origins": [
+                  "*"
+                ],
+                "origin": "*",
+                "methods": [
+                  "OPTIONS",
+                  "POST"
+                ],
+                "headers": [
+                  "Content-Type",
+                  "X-Amz-Date",
+                  "Authorization",
+                  "X-Api-Key",
+                  "X-Amz-Security-Token",
+                  "X-Amz-User-Agent"
+                ],
+                "allowCredentials": false
+              },
               "integration": "AWS_PROXY"
             }
           }
@@ -828,7 +1255,7 @@
         "timeout": 6,
         "runtime": "python3.8",
         "vpc": {},
-        "versionLogicalId": "HelloLambdaVersionUWc2TdbGsybDZJQRzg9pgo2fDJG5vDoqtxTBjsaVyJU"
+        "versionLogicalId": "HelloLambdaVersionKZZnfL1rh5Zny30gkDKOsz1zW9c5eZ82m4xu3bANNAw"
       },
       "whoami": {
         "handler": "s_whoami.handler",
@@ -837,6 +1264,25 @@
             "http": {
               "path": "whoami",
               "method": "get",
+              "cors": {
+                "origins": [
+                  "*"
+                ],
+                "origin": "*",
+                "methods": [
+                  "OPTIONS",
+                  "GET"
+                ],
+                "headers": [
+                  "Content-Type",
+                  "X-Amz-Date",
+                  "Authorization",
+                  "X-Api-Key",
+                  "X-Amz-Security-Token",
+                  "X-Amz-User-Agent"
+                ],
+                "allowCredentials": false
+              },
               "integration": "AWS_PROXY"
             }
           }
@@ -847,10 +1293,75 @@
         "timeout": 6,
         "runtime": "python3.8",
         "vpc": {},
-        "versionLogicalId": "WhoamiLambdaVersionnj15TlkmdMsbtYIW0mM6tMhil3qoMRK1yxgohg4MYI"
+        "versionLogicalId": "WhoamiLambdaVersion2QvOkeKlDyDltJQcUhC13VPUDBj7DyADjJ0jkijElw"
+      },
+      "players": {
+        "handler": "s_players.handler",
+        "events": [
+          {
+            "http": {
+              "path": "players",
+              "method": "get",
+              "cors": {
+                "origins": [
+                  "*"
+                ],
+                "origin": "*",
+                "methods": [
+                  "OPTIONS",
+                  "GET"
+                ],
+                "headers": [
+                  "Content-Type",
+                  "X-Amz-Date",
+                  "Authorization",
+                  "X-Api-Key",
+                  "X-Amz-Security-Token",
+                  "X-Amz-User-Agent"
+                ],
+                "allowCredentials": false
+              },
+              "integration": "AWS_PROXY"
+            }
+          },
+          {
+            "http": {
+              "path": "players/{proxy+}",
+              "method": "get",
+              "cors": {
+                "origins": [
+                  "*"
+                ],
+                "origin": "*",
+                "methods": [
+                  "OPTIONS",
+                  "GET"
+                ],
+                "headers": [
+                  "Content-Type",
+                  "X-Amz-Date",
+                  "Authorization",
+                  "X-Api-Key",
+                  "X-Amz-Security-Token",
+                  "X-Amz-User-Agent"
+                ],
+                "allowCredentials": false
+              },
+              "integration": "AWS_PROXY"
+            }
+          }
+        ],
+        "name": "dfs-web-dev-players",
+        "package": {},
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "python3.8",
+        "vpc": {},
+        "versionLogicalId": "PlayersLambdaVersionv4BFQNaCOFFqHwM6t86BAAEBos8rmrp0wPkydbkdY"
       }
     },
     "configValidationMode": "warn",
+    "serviceFilename": "serverless.yml",
     "app": "dfs-web-app",
     "org": "alk272",
     "layers": {},
@@ -866,16 +1377,22 @@
       },
       "functions": {
         "$ref": "$[\"service\"][\"functions\"]"
+      },
+      "plugins": {
+        "$ref": "$[\"service\"][\"plugins\"]"
+      },
+      "custom": {
+        "$ref": "$[\"service\"][\"custom\"]"
       }
     },
     "isDashboardMonitoringPreconfigured": true,
     "isDashboardAppPreconfigured": true,
     "orgUid": "3d8fcba4-af3d-47f0-84cc-e78c4ffb51d0",
     "appUid": "t9FFMKH4SwnPRqndc9",
-    "artifact": "C:\\Users\\kooan\\Projects\\cornell-tech\\cs5356_building_startups\\dfs-web\\backend\\dfs-web\\.serverless\\dfs-web.zip"
+    "artifact": "C:\\Users\\kooan\\Projects\\cornell-tech\\cs5356_building_startups\\dfs-web\\backend\\.serverless\\dfs-web.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/dfs-web/dev/1619046685354-2021-04-21T23:11:25.354Z",
+    "artifactDirectoryName": "serverless/dfs-web/dev/1619280968957-2021-04-24T16:16:08.957Z",
     "artifact": "dfs-web.zip"
   }
 }

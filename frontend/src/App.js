@@ -2,6 +2,7 @@ import './App.css';
 import React from 'react';
 import SignInScreen from './SignInScreen.js';
 import HomeScreen from './HomeScreen.js';
+import SlateScreen from './SlateScreen.js';
 import {
   BrowserRouter as Router,
   Switch,
@@ -16,6 +17,7 @@ function App() {
         <Switch>
           <Route path="/" exact component={SignInScreen} />
           <Route path="/home" component={HomeScreen} />
+          <Route path="/players" component={SlateScreen} />
         </Switch>
       </div>
     </Router>
